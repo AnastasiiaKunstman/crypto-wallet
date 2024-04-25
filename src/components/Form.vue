@@ -1,43 +1,45 @@
 <template>
     <div class="currency-converter">
-        <h2 class="form_title">{{ title }}</h2>
+        <h2 class="currency-converter__title">{{ title }}</h2>
         <div class="input-container">
-            <label>Вы отдаете</label>
-            <div class="input">
+            <label class="input-container__label">Вы отдаете</label>
+            <div class="input-container__input">
                 <input min="0" type="text" v-model="inputValue" placeholder="Введите сумму"
-                    @input="handleInput('input', $event.target.value)" @focus="clearCurrencySymbolInput" />
+                    @input="handleInput('input', $event.target.value)" @blur="formatCurrencyInput('input')"
+                    @focus="clearCurrencySymbolInput" />
                 <DropDown v-model="inputCurrency" :options="currencies" labelKey="name" valueKey="code"
                     :change="handleDropdownChange" />
             </div>
         </div>
         <div class="info">
-            <div class="info-box">
-                <div class="info-text">{{ exchangeRate }}</div>
-                <img src="/src/assets/Line.svg" alt="" class="info-img" />
+            <div class="info__box">
+                <div class="info-box__text">{{ exchangeRate }}</div>
+                <img src="/src/assets/Line.svg" alt="" class="info-box__img" />
             </div>
             <button @click="swapCurrencies" class="converter-btn">
-                <img src="/src/assets/icon.svg" class="form_icon" />
+                <img src="/src/assets/icon.svg" class="converter-btn__icon" />
             </button>
         </div>
         <div class="input-container">
-            <label>Вы получаете</label>
-            <div class="input">
+            <label class="input-container__label">Вы получаете</label>
+            <div class="input-container__input">
                 <input min="0" type="text" v-model="outputValue" placeholder="Введите сумму"
-                    @input="handleInput('output', $event.target.value)" @focus="clearCurrencySymbolOutput">
+                    @input="handleInput('output', $event.target.value)" @blur="formatCurrencyInput('output')"
+                    @focus="clearCurrencySymbolOutput">
                 <DropDown v-model="outputCurrency" :options="currencies" labelKey="name" valueKey="code"
                     :change="handleDropdownChange" />
             </div>
         </div>
-        <button @click="calculate" class="convert-btn" :disabled="loading">
-            {{ loading ? 'Загрузка...' : 'Продолжить' }}
+        <button @click="calculate" class="currency-converter__button" :disabled="loading">
+            {{ loading ? 'Подождите...' : 'Продолжить' }}
         </button>
-        <p class="error" v-if="error !== ''">{{ error }}</p>
+        <p class="currency-converter__error" v-if="error !== ''">{{ error }}</p>
     </div>
 </template>
 
 <script setup>
-import axios from 'axios';
 import { ref, onMounted, watch } from 'vue';
+import axios from 'axios';
 import DropDown from './DropDown.vue';
 
 // Состояние компонента
@@ -56,6 +58,8 @@ const loading = ref(false);
 const title = "Введите сумму обмена и выберите валюты";
 
 // Методы компонента
+
+// Получение данных с сервера
 async function fetchCurrencies() {
     try {
         const response = await axiosInstance.get('https://api-exchange.cryptocloud.plus/exchange/all_currency');
@@ -77,6 +81,7 @@ async function fetchCurrencies() {
     }
 }
 
+// Валидация инпутов
 function handleInput(type, value) {
     value = value.replace(',', '.');
 
@@ -84,8 +89,10 @@ function handleInput(type, value) {
         value = value.slice(1);
     }
 
-    const currencySymbol = type === 'input' ? inputCurrency.value : outputCurrency.value;
-    value = value ? value : `${value} ${currencySymbol}`;
+    if (!/^\d*\.?\d*$/.test(value)) {
+        // Если введены недопустимые символы, очищаем значение
+        value = value.replace(/[^\d.]/g, '');
+    }
 
     // Устанавливаем значение в соответствующий инпут
     if (type === 'input') {
@@ -95,6 +102,23 @@ function handleInput(type, value) {
     }
 }
 
+// Добавление аббревиатуры валюты к значениям в инпутах
+function formatCurrencyInput(type) {
+    let value = type === 'input' ? inputValue.value : outputValue.value;
+    const currencySymbol = type === 'input' ? inputCurrency.value : outputCurrency.value;
+
+    if (value.trim() !== '') {
+        value = value.trim() + " " + currencySymbol;
+    }
+
+    if (type === 'input') {
+        inputValue.value = value;
+    } else {
+        outputValue.value = value;
+    }
+}
+
+// Очистка инпутов при фокусе
 function clearCurrencySymbolInput() {
     inputValue.value = '';
 }
@@ -103,6 +127,7 @@ function clearCurrencySymbolOutput() {
     outputValue.value = '';
 }
 
+// Установка временного интервала отображения ошибки
 function showError(message) {
     error.value = message;
 
@@ -115,6 +140,7 @@ function handleDropdownChange(value) {
     console.log('Selected option:', value);
 }
 
+// Отправка данных на сервер для рвсчетов результата
 async function calculate() {
     loading.value = true;
 
@@ -181,6 +207,7 @@ function swapCurrencies() {
     outputCurrency.value = tempCurrency;
 }
 
+// Расчет курса выбранных валют
 async function calculateExchangeRate() {
     try {
         if (inputCurrency.value && outputCurrency.value) {
@@ -204,24 +231,21 @@ async function calculateExchangeRate() {
 watch([inputCurrency, outputCurrency], calculateExchangeRate);
 
 onMounted(calculateExchangeRate);
-
-onMounted(() => {
-    fetchCurrencies();
-});
+onMounted(() => fetchCurrencies());
 </script>
 
 <style scoped>
 .currency-converter {
     width: 100%;
-    height: 52.8vh;
+    max-height: 100%;
     padding: 7.25% 7.25% 11.8%;
     border-radius: 20px;
     background: #FFF;
     box-shadow: 0px 5px 50px -5px rgba(15, 15, 15, 0.05);
 }
 
-.form_title {
-    width: 85%;
+.currency-converter__title {
+    height: 13.8%;
     margin-bottom: 6.9%;
     color: #23262F;
     font-size: clamp(20px, 1.94vw, 28px);
@@ -237,21 +261,21 @@ onMounted(() => {
     gap: 6px;
 }
 
-.input-container label {
+.input-container__label {
     color: #5F5F5F;
     font-size: clamp(10px, 0.97vw, 14px);
     font-weight: 400;
     line-height: 171.429%;
 }
 
-.input {
+.input-container__input {
     display: flex;
     align-items: center;
 }
 
-.input input {
+.input-container__input input {
     width: 100%;
-    height: 5.05vh;
+    height: 48px;
     border-radius: 6px;
     border: 1px solid #F0F0F0;
     background: #FFF;
@@ -263,55 +287,20 @@ onMounted(() => {
     line-height: 150%;
 }
 
-.input input:focus-visible {
+.input-container__input ::-webkit-input-placeholder {
+    color: #F0F0F0;
+}
+
+.input-container__input input:focus-visible {
     outline-color: #F0F0F0;
 }
 
-.input input:focus::-webkit-input-placeholder {
+.input-container__input input:focus::-webkit-input-placeholder {
     color: transparent;
 }
 
-.amount-input {
-    width: 100%;
-}
-
-.converter-btn {
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-}
-
-.form_icon {
-    max-width: 24px;
-    max-height: 24px;
-    cursor: pointer;
-}
-
-.convert-btn {
-    width: 100%;
-    height: 5.5vh;
-    padding: 1.11vw 1.66vw;
-    border-radius: 90px;
-    background: #4A40C6;
-    color: #FFF;
-    border: none;
-    cursor: pointer;
-    margin-top: 3.47vw;
-    font-size: clamp(14px, 1.1vw, 16px);
-    font-style: normal;
-    font-weight: 500;
-    line-height: 150%;
-}
-
-.convert-btn:hover {
-    opacity: 0.7;
-}
-
-.convert-btn:disabled {
-    opacity: 0.5;
-}
-
 .info {
+    height: 9.2%;
     display: flex;
     margin-top: 0.7vw;
     justify-content: space-between;
@@ -320,12 +309,12 @@ onMounted(() => {
     align-content: center;
 }
 
-.info-box {
+.info__box {
     display: flex;
     flex-direction: column;
 }
 
-.info-text {
+.info-box__text {
     height: 12px;
     margin-bottom: 0.42vw;
     color: #5F5F5F;
@@ -333,8 +322,44 @@ onMounted(() => {
     line-height: normal;
 }
 
-.info-img {
+.info-box__img {
     width: 7.8vw;
+}
+
+.converter-btn {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.converter-btn__icon {
+    max-width: 24px;
+    max-height: 24px;
+    cursor: pointer;
+}
+
+.currency-converter__button {
+    width: 100%;
+    height: 5.5vh;
+    border-radius: 90px;
+    background: #4A40C6;
+    color: #FFF;
+    border: none;
+    cursor: pointer;
+    margin-top: 10%;
+    font-size: clamp(14px, 1.1vw, 16px);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%;
+    text-align: center;
+}
+
+.currency-converter__button:hover {
+    opacity: 0.7;
+}
+
+.currency-converter__button:disabled {
+    opacity: 0.5;
 }
 
 .currency-img {
@@ -343,7 +368,7 @@ onMounted(() => {
     margin-right: 0.35vw;
 }
 
-.error {
+.currency-converter__error {
     margin-top: 0.35vw;
     color: red;
     text-align: center;

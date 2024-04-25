@@ -1,7 +1,35 @@
-# Vue 3 + Vite
+# Crypto Wallet
+[Тестовое задание](https://drive.google.com/file/d/1bwlQFbmjGmQXYKb8tFz-BxlQXu0phcgj/view?usp=drive_link)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## Стек
+- Vue 3 + Vite
 
-## Recommended IDE Setup
+## Сборка
 
-- [VS Code](https://code.visualstudio.com/) + [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (previously Volar) and disable Vetur
+✅ Клонировать ветку "main" на локальный компьютер
+
+```
+git clone git@github.com:AnastasiiaKunstman/crypto-wallet.git
+
+```
+✅ Перейти в папку с проектом
+
+```
+cd crypto-wallet
+
+```
+✅ Установить зависимости
+
+```
+npm install
+
+```
+✅ Запустить проект
+
+```
+npm start
+
+```
+
+## Ссылка на проект:
+https://crypto-wallet-blond.vercel.app

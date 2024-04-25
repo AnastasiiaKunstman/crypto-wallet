@@ -7,7 +7,7 @@
       <p class="info-subtitle">
         {{ subtitle }}
       </p>
-      <img class="info-img" src="/src/assets/Group.png" alt="" />
+      <!-- <img class="info-img" src="/src/assets/Group.png" alt="" /> -->
     </div>
     <div class="form">
       <Form />
@@ -32,7 +32,7 @@ const subtitle = "Обменивайте Bitcoin, Litecoin, Ethereum, Tether и 
 }
 
 .info-title {
-  width: 68%;
+  width: 27vw;
   font-size: clamp(24px, 2.5vw, 36px);
   font-style: normal;
   font-weight: 700;
@@ -45,7 +45,7 @@ span {
 }
 
 .info-subtitle {
-  width: 69%;
+  width: 27.85vw;
   font-size: clamp(14px, 1.25vw, 18px);
   font-style: normal;
   font-weight: 300;
@@ -55,8 +55,6 @@ span {
 .info-img {
   margin-left: -4.6vw;
   transform: rotate(10.874deg);
-  width: 41.7vw;
-  height: 41.6vh;
 }
 
 .form {
@@ -66,19 +64,13 @@ span {
 @media (max-width: 950px) {
 
   .info,
-  .info_title {
+  .info-title,
+  .info-subtitle {
     width: 100%;
   }
 
   .form {
     width: 70%;
-  }
-
-  .info_img {
-    width: auto;
-    height: 30vh;
-    transform: rotate(0deg);
-    margin-left: 0;
   }
 }
 

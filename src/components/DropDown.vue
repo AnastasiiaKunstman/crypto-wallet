@@ -1,33 +1,34 @@
 <template>
     <div class="dropdown-wrapper">
         <div class="dropdown-selected-option" @click="toggleDropDownVisibility">
-            <div class="dropdown-box">
-                <img :src="selectedOption ? selectedOption.icon : ''" alt="" class="selected-option-icon" />
-                <p class="dropdown-txt">{{ mappedSelectedOption }}</p>
+            <div class="dropdown-selected-option__box">
+                <img :src="selectedOption ? selectedOption.icon : ''" alt="" class="dropdown-selected-option__icon" />
+                <p class="dropdown-selected-option__text">{{ mappedSelectedOption }}</p>
             </div>
-            <img src="/src/assets/dropdown.svg" alt="" class="dropdown-img" />
+            <img src="/src/assets/dropdown.svg" alt="" class="dropdown-selected-option__img" />
         </div>
         <div class="options-wrapper" v-if="isDropDownVisible" ref="optionsWrapper">
             <div class="options-header">
-                <p class="options_title">Выберите криптовалюту</p>
+                <p class="options-header__title">Выберите криптовалюту</p>
                 <img src="/src/assets/x.svg" alt="" @click="toggleDropDownVisibility" />
             </div>
             <div class="search-input-wrapper">
-                <input type="search" placeholder="Название валюты..." class="options-search" v-model="searchText" />
-                <img class="search-img" src="/src/assets/search.svg" alt="" />
+                <input type="search" placeholder="Название валюты..." class="search-input-wrapper__search"
+                    v-model="searchText" />
+                <img class="search-input-wrapper__img" src="/src/assets/search.svg" alt="" />
             </div>
             <div class="options-filters">
-                <p class="options-filter" v-for="filter in filters" :key="filter">{{ filter }}</p>
+                <p class="options-filters__filter" v-for="filter in filters" :key="filter">{{ filter }}</p>
             </div>
             <div class="option" v-for="(option, index) in filteredOptions" :key="index"
                 @click="handleOptionSelect(option)">
-                <div class="option-box">
-                    <img :src="option.icon" :alt="option.name" class="options-img" />
+                <div class="option__box">
+                    <img :src="option.icon" :alt="option.name" class="option__img" />
                     <p>{{ option.name }}</p>
                 </div>
-                <div class="option-box2">
+                <div class="option__box2">
                     <p>{{ option.full_name }}</p>
-                    <p class="option-network">{{ option.full_network !== option.full_name ? option.full_network : '' }}
+                    <p class="option__network">{{ option.full_network !== option.full_name ? option.full_network : '' }}
                     </p>
                 </div>
             </div>
@@ -37,11 +38,12 @@
 </template>
 
 <script setup>
-import { ref, defineProps, computed, defineEmits, onMounted, onUnmounted } from 'vue';
+import { ref, defineProps, computed, defineEmits, onMounted, onUnmounted, nextTick } from 'vue';
 
 const isDropDownVisible = ref(false);
 const searchText = ref('');
 const emit = defineEmits(['update:modelValue'])
+const optionsWrapper = ref('');
 
 const props = defineProps({
     modelValue: String,
@@ -96,7 +98,6 @@ const closeDropDown = (event) => {
 };
 </script>
 
-
 <style scoped>
 .dropdown-wrapper {
     width: 28.4%;
@@ -121,23 +122,19 @@ const closeDropDown = (event) => {
     gap: 0.42vw;
 }
 
-.dropdown-box {
+.dropdown-selected-option__box {
     display: flex;
     gap: 0.42vw;
 }
 
-.dropdown-img {
+.dropdown-selected-option__img {
     max-width: 8px;
 }
 
-.dropdown-txt {
+.dropdown-selected-option__text {
     font-size: clamp(12px, 0.97vw, 14px);
     font-style: normal;
     font-weight: 400;
-}
-
-.selected-option-icon {
-    max-width: 24px;
 }
 
 .search-input-wrapper {
@@ -153,9 +150,7 @@ const closeDropDown = (event) => {
     color: transparent;
 }
 
-.search-img {
-    width: 1.4vw;
-    height: 1.4vw;
+.search-input-wrapper__img {
     position: absolute;
     right: 6px;
     top: 6px;
@@ -201,14 +196,14 @@ const closeDropDown = (event) => {
     margin-bottom: 12px;
 }
 
-.options_title {
-    font-size: clamp(10px, 0.97vw, 14px);
+.options-header__title {
+    font-size: 14px;
     font-style: normal;
     font-weight: 400;
     line-height: 128.571%;
 }
 
-.options-search {
+.search-input-wrapper__search {
     width: 241px;
     height: 32px;
     border-radius: 6px;
@@ -224,7 +219,7 @@ const closeDropDown = (event) => {
     margin-bottom: 10px;
 }
 
-.options-filter {
+.options-filters__filter {
     display: flex;
     width: 88px;
     height: 24px;
@@ -241,12 +236,12 @@ const closeDropDown = (event) => {
     line-height: 240%;
 }
 
-.options-filter:first-child {
+.options-filters__filter:first-child {
     width: 53px;
     border: 1px solid #958EE8;
 }
 
-.options-filter:hover {
+.options-filters__filter:hover {
     border: 1px solid #958EE8;
     cursor: pointer;
 }
@@ -277,12 +272,12 @@ const closeDropDown = (event) => {
     margin: 0;
 }
 
-.options-img {
+.option__img {
     width: 20px;
     height: 20px;
 }
 
-.option-box {
+.option__box {
     display: flex;
     gap: 6px;
     align-items: center;
@@ -293,7 +288,7 @@ const closeDropDown = (event) => {
     line-height: 128.571%;
 }
 
-.option-box2 {
+.option__box2 {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -305,7 +300,7 @@ const closeDropDown = (event) => {
     line-height: 100%;
 }
 
-.option-network {
+.option__network {
     color: #9A9A9A;
     text-align: right;
     font-size: clamp(6px, 0.55vw, 8px);
