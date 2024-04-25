@@ -24,6 +24,12 @@ cd crypto-wallet
 npm install
 
 ```
+✅ Запустить сборку
+
+```
+npm run build
+
+```
 ✅ Запустить проект
 
 ```
